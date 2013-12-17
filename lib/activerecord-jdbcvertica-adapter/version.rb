@@ -1,5 +1,5 @@
 module Activerecord
-  module Jdbcvertica6
+  module Jdbcvertica
     module Adapter
       VERSION = "0.0.1"
     end

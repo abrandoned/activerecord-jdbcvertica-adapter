@@ -1,11 +1,11 @@
 # -*- encoding: utf-8 -*-
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'activerecord-jdbcvertica6-adapter/version'
+require 'activerecord-jdbcvertica-adapter/version'
 
 Gem::Specification.new do |gem|
-  gem.name          = "activerecord-jdbcvertica6-adapter"
-  gem.version       = Activerecord::Jdbcvertica6::Adapter::VERSION
+  gem.name          = "activerecord-jdbcvertica-adapter"
+  gem.version       = Activerecord::Jdbcvertica::Adapter::VERSION
   gem.authors       = ["Brandon Dewitt"]
   gem.email         = ["brandonsdewitt@gmail.com"]
   gem.description   = %q{ An ActiveRecord adapter for Vertica databases (jdbc based) }
