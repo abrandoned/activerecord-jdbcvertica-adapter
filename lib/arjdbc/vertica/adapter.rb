@@ -6,7 +6,7 @@ module ::ArJdbc
     ADAPTER_NAME = 'Vertica'.freeze
 
     NATIVE_DATABASE_TYPES = {
-      :primary_key => "integer not null primary key",
+      :primary_key => "auto_increment", 
       :string      => { :name => "varchar", :limit => 255 },
       :text        => { :name => "varchar", :limit => 15000 },
       :integer     => { :name => "integer" },
@@ -23,6 +23,12 @@ module ::ArJdbc
 
     def adapter_name
       ADAPTER_NAME
+    end
+
+    def exec_insert(sql, name, binds, *args)
+      execute(sql, name, binds)
+
+      return select_value("SELECT LAST_INSERT_ID();")
     end
 
     def native_database_types

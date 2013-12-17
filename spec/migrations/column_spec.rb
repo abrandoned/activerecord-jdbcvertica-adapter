@@ -85,4 +85,29 @@ describe ColumnKing do
       connection.column_exists?(:kings, :name, :text)
     end
   end
+
+  describe "#remove_column" do
+    it "removes a column that is present" do
+      connection.add_column(:kings, :name, :string)
+      connection.column_exists?(:kings, :name).must_equal(true)
+      connection.remove_column(:kings, :name)
+      connection.column_exists?(:kings, :name).must_equal(false)
+    end
+
+    it "raises an error if column not present" do
+      -> {
+        connection.remove_column(:kings, :name)
+      }.must_raise(ActiveRecord::StatementInvalid)
+    end
+  end
+
+  describe "#rename_column" do
+    it "does not rename columns (JDBC)" do 
+      connection.add_column(:kings, :name, :string)
+
+      -> {
+        connection.rename_column(:kings, :name, :name2)
+      }.must_raise(NotImplementedError)
+    end
+  end
 end
