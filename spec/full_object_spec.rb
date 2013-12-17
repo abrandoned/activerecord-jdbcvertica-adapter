@@ -46,6 +46,28 @@ describe ::FullObject do
     specify { subject.must_respond_to(:boolean) }
   end
 
+  describe "#delete" do
+    it "deletes a persisted record" do 
+      subject.string = "string"
+      subject.save
+
+      FullObject.count.must_equal(1)
+      subject.delete
+      FullObject.count.must_equal(0)
+    end
+  end
+
+  describe "#delete_all" do
+    it "deletes a persisted record" do 
+      subject.string = "string"
+      subject.save
+
+      FullObject.count.must_equal(1)
+      FullObject.where("id > 0").delete_all
+      FullObject.count.must_equal(0)
+    end
+  end
+
   describe "#insert" do
     it "string" do 
       subject.string = "string"
