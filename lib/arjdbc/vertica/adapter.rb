@@ -36,24 +36,17 @@ module ::ArJdbc
       return select_value("SELECT LAST_INSERT_ID();")
     end
 
+    def native_database_types
+      NATIVE_DATABASE_TYPES
+    end 
+
     ##
     # Vertica does not allow the table name to prefix the columns when
     # setting a value, this is not a pleasant work-around, but it works
     #
-    def exec_update(sql, name, binds)
-      set_split = sql.split("SET")
-      before_set = set_split.first
-      after_set = set_split.last
-      table_name = before_set.split("UPDATE").last.strip
-
-      new_sql = "#{before_set} SET #{after_set.gsub(table_name + '.', '')}"
-
-      return super(new_sql, name, binds)
+    def quote_table_name_for_assignment(table, attr)
+      quote_column_name(attr)
     end
-
-    def native_database_types
-      NATIVE_DATABASE_TYPES
-    end 
 
   end
 end
