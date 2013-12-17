@@ -37,7 +37,7 @@ module ActiveRecord::ConnectionAdapters
     include ::ArJdbc::Vertica
 
     def rename_index(*args)
-      raise ArgumentError
+      raise ArgumentError, "rename_index does not work on Vertica"
     end
   end
 end
