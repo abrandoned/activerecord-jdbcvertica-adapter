@@ -46,7 +46,7 @@ describe ::FullObject do
     specify { subject.must_respond_to(:boolean) }
   end
 
-  describe "store and retrieve" do
+  describe "#insert" do
     it "string" do 
       subject.string = "string"
       subject.save
@@ -125,6 +125,108 @@ describe ::FullObject do
 
       retrieved = FullObject.find(subject.id)
       retrieved.boolean.must_equal(subject.boolean)
+    end
+  end
+
+  describe "#update" do
+    it "string" do 
+      change_to = "string2"
+      subject.string = "string"
+      subject.save
+
+      retrieved = FullObject.find(subject.id)
+      retrieved.update(:string => change_to)
+      retrieved.reload.string.must_equal(change_to)
+    end
+
+    it "text" do 
+      change_to = "text2"
+      subject.text = "text"
+      subject.save
+
+      retrieved = FullObject.find(subject.id)
+      retrieved.update(:text => change_to)
+      retrieved.reload.text.must_equal(change_to)
+    end
+
+    it "integer" do 
+      change_to = 4321
+      subject.integer = 1234
+      subject.save
+
+      retrieved = FullObject.find(subject.id)
+      retrieved.update(:integer => change_to)
+      retrieved.reload.integer.must_equal(change_to)
+    end
+
+    it "float" do 
+      change_to = 4321.1234
+      subject.float = 1234.4321
+      subject.save
+
+      retrieved = FullObject.find(subject.id)
+      retrieved.update(:float => change_to)
+      retrieved.reload.float.must_equal(change_to)
+    end
+
+    it "decimal" do 
+      change_to = 4321.1234
+      subject.decimal = 1234.4321
+      subject.save
+
+      retrieved = FullObject.find(subject.id)
+      retrieved.update(:decimal => change_to)
+      retrieved.reload.decimal.must_equal(change_to)
+    end
+
+    it "datetime" do 
+      change_to = Time.new(2010).utc
+      subject.datetime = Time.current.utc
+      subject.save
+
+      retrieved = FullObject.find(subject.id)
+      retrieved.update(:datetime => change_to)
+      retrieved.reload.datetime.to_s.must_equal(change_to.to_s)
+    end
+
+    it "time" do 
+      change_to = Time.new(2010).utc
+      subject.time = Time.current.utc
+      subject.save
+
+      retrieved = FullObject.find(subject.id)
+      retrieved.update(:time => change_to)
+      retrieved.reload.time.strftime("%H%M%S").must_equal(change_to.strftime("%H%M%S"))
+    end
+
+    it "date" do 
+      change_to = Time.new(2010).utc
+      subject.date = Time.current
+      subject.save
+
+      retrieved = FullObject.find(subject.id)
+      retrieved.update(:date => change_to)
+      retrieved.reload.date.strftime("%Y%m%d").must_equal(change_to.strftime("%Y%m%d"))
+    end
+
+    it "boolean (false)" do 
+      change_to = true
+      subject.boolean = false
+      subject.save
+
+      retrieved = FullObject.find(subject.id)
+      retrieved.update(:boolean => change_to)
+      retrieved.reload.boolean.must_equal(change_to)
+    end
+
+    it "boolean (true)" do 
+      change_to = false
+      subject.boolean = true
+      subject.save
+
+      retrieved = FullObject.find(subject.id)
+      retrieved.update(:boolean => change_to)
+      retrieved.reload.boolean.must_equal(change_to)
     end
   end
 end
