@@ -17,41 +17,53 @@ class TableKing < ::ActiveRecord::Migration
 end
 
 describe ::TableKing do
+  def connection
+    ::ActiveRecord::Base.connection
+  end
+
   before do
     ::TableKing.drop_kings
   end
 
   describe "#create_table" do
     it "creates a table in the schema with create_table" do
-      ::ActiveRecord::Base.connection.tables.wont_include("kings")
+      connection.tables.wont_include("kings")
       ::TableKing.up
-      ::ActiveRecord::Base.connection.tables.must_include("kings")
+      connection.tables.must_include("kings")
       ::TableKing.down
-      ::ActiveRecord::Base.connection.tables.wont_include("kings")
+      connection.tables.wont_include("kings")
     end
   end
 
   describe "#drop_table" do
     it "drops a table in the schema with drop_table" do
-      ::ActiveRecord::Base.connection.tables.wont_include("kings")
+      connection.tables.wont_include("kings")
       ::TableKing.up
-      ::ActiveRecord::Base.connection.tables.must_include("kings")
+      connection.tables.must_include("kings")
       ::TableKing.down
-      ::ActiveRecord::Base.connection.tables.wont_include("kings")
+      connection.tables.wont_include("kings")
+    end
+  end
+
+  describe "#rename_table" do
+    it "renames a table" do
+      -> {
+        connection.rename_table("kings", "king_slayers")
+      }.must_raise(NotImplementedError)
     end
   end
 
   describe "#table_exists?" do
     it "returns false if table not present" do
-      ::ActiveRecord::Base.connection.table_exists?("kings").must_equal(false)
+      connection.table_exists?("kings").must_equal(false)
     end
 
     it "returns true if table is present" do
-      ::ActiveRecord::Base.connection.table_exists?("kings").must_equal(false)
+      connection.table_exists?("kings").must_equal(false)
       ::TableKing.up
-      ::ActiveRecord::Base.connection.table_exists?("kings").must_equal(true)
+      connection.table_exists?("kings").must_equal(true)
       ::TableKing.down
-      ::ActiveRecord::Base.connection.table_exists?("kings").must_equal(false)
+      connection.table_exists?("kings").must_equal(false)
     end
   end
 end
