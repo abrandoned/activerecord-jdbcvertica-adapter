@@ -1,6 +1,3 @@
-require 'java'
-require 'activerecord-jdbcvertica6-adapter/jars/vertica-jdk5-6.1.3-0.jar'
-
 # Load a mapping for the "text" type that will actually work
 ::ActiveRecord::ConnectionAdapters::JdbcTypeConverter::AR_TO_JDBC_TYPES[:text] << lambda { |r| r['type_name'] =~ /varchar$/i }
 
@@ -38,5 +35,9 @@ end
 module ActiveRecord::ConnectionAdapters
   class VerticaAdapter < JdbcAdapter
     include ::ArJdbc::Vertica
+
+    def rename_index(*args)
+      raise ArgumentError
+    end
   end
 end
