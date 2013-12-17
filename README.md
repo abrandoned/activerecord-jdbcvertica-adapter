@@ -1,4 +1,4 @@
-# Activerecord::Jdbcvertica6::Adapter
+# Activerecord::Jdbcvertica::Adapter
 
 TODO: Write a gem description
 
@@ -6,7 +6,7 @@ TODO: Write a gem description
 
 Add this line to your application's Gemfile:
 
-    gem 'activerecord-jdbcvertica6-adapter'
+    gem 'activerecord-jdbcvertica-adapter'
 
 And then execute:
 
@@ -14,7 +14,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install activerecord-jdbcvertica6-adapter
+    $ gem install activerecord-jdbcvertica-adapter
 
 ## Usage
 
