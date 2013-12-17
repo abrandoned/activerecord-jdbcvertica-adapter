@@ -8,7 +8,9 @@ class IndexKing < ::ActiveRecord::Migration
   end
 
   def self.up
-    create_table :kings
+    create_table :kings do |t|
+      t.string :king_name_to_not_have_only_auto_increment_columns
+    end
   end
 
   def self.down

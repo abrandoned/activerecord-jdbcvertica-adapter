@@ -251,4 +251,21 @@ describe ::FullObject do
       retrieved.reload.boolean.must_equal(change_to)
     end
   end
+
+  describe "#update_all" do
+    it "boolean (false)" do
+      change_to = true
+      subject.boolean = false
+      subject.save
+
+      another = FullObject.new
+      another.boolean = false
+      another.save
+
+      FullObject.where(:boolean => false).count.must_equal(2)
+      FullObject.where(:boolean => false).update_all(:boolean => true)
+      FullObject.where(:boolean => false).count.must_equal(0)
+      FullObject.where(:boolean => true).count.must_equal(2)
+    end
+  end
 end
