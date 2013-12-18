@@ -6,7 +6,7 @@ module ::ArJdbc
     ADAPTER_NAME = 'Vertica'.freeze
 
     NATIVE_DATABASE_TYPES = {
-      :primary_key => "auto_increment", 
+      :primary_key => "auto_increment primary key",
       :string      => { :name => "varchar", :limit => 255 },
       :text        => { :name => "varchar", :limit => 15000 },
       :integer     => { :name => "integer" },
@@ -41,11 +41,27 @@ module ::ArJdbc
     end 
 
     ##
+    # Vertica should "auto-discover" the primary key if marked on the table
+    #
+    def primary_keys(table)
+      @primary_keys ||= {}
+      return @primary_keys[table] if @primary_keys[table]
+
+      keys = self.execute("SELECT column_name FROM v_catalog.primary_keys WHERE table_name = '#{table}';")
+      @primary_keys[table] = [ keys.first['column_name'] ]
+      @primary_keys[table]
+    end
+
+    ##
     # Vertica does not allow the table name to prefix the columns when
     # setting a value, this is not a pleasant work-around, but it works
     #
     def quote_table_name_for_assignment(table, attr)
       quote_column_name(attr)
+    end
+
+    def rename_index(*args)
+      raise ArgumentError, "rename_index does not work on Vertica"
     end
 
   end
@@ -54,9 +70,5 @@ end
 module ActiveRecord::ConnectionAdapters
   class VerticaAdapter < JdbcAdapter
     include ::ArJdbc::Vertica
-
-    def rename_index(*args)
-      raise ArgumentError, "rename_index does not work on Vertica"
-    end
   end
 end

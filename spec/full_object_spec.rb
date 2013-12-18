@@ -22,8 +22,7 @@ class CreateFullObject < ::ActiveRecord::Migration
   end
 end
 
-class FullObject < ::ActiveRecord::Base;
-  self.primary_key = "id"
+class FullObject < ::ActiveRecord::Base
 end
 
 describe ::FullObject do

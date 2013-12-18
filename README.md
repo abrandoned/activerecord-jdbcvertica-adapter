@@ -1,6 +1,5 @@
 # Activerecord::Jdbcvertica::Adapter
-
-TODO: Write a gem description
+ActiveRecord adapter for Vertica databases (version 5,6,7) that works on Jruby with Vertica JDBC adapter
 
 ## Installation
 
@@ -17,8 +16,6 @@ Or install it yourself as:
     $ gem install activerecord-jdbcvertica-adapter
 
 ## Usage
-
-TODO: Write usage instructions here
 
 ## Contributing
 
