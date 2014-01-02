@@ -1,3 +1,5 @@
+require 'arjdbc/vertica/column'
+
 # Load a mapping for the "text" type that will actually work
 ::ActiveRecord::ConnectionAdapters::JdbcTypeConverter::AR_TO_JDBC_TYPES[:text] << lambda { |r| r['type_name'] =~ /varchar$/i }
 
@@ -27,6 +29,22 @@ module ::ArJdbc
 
     def add_index(*args)
       # no op
+    end
+
+    def columns(table_name, name = nil)
+      sql = "SELECT * from V_CATALOG.COLUMNS WHERE table_name = '#{table_name}';"
+      raw_columns = execute(sql, name || "SCHEMA")
+      columns = raw_columns.map do |raw_column|
+        ::ActiveRecord::ConnectionAdapters::VerticaColumn.new(
+          raw_column['column_name'],
+          raw_column['column_default'],
+          raw_column['data_type'],
+          raw_column['is_nullable'], 
+          raw_column['is_identity']
+        )
+      end
+
+      return columns
     end
 
     ##
