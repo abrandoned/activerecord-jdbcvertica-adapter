@@ -25,6 +25,10 @@ module ::ArJdbc
       ADAPTER_NAME
     end
 
+    def add_index(*args)
+      # no op
+    end
+
     ##
     # Vertica JDBC does not work with JDBC GET_GENERATED_KEYS
     # so we need to execute the sql raw and then lookup the 
@@ -60,8 +64,12 @@ module ::ArJdbc
       quote_column_name(attr)
     end
 
+    def remove_index(*args)
+      # no op
+    end
+
     def rename_index(*args)
-      raise ArgumentError, "rename_index does not work on Vertica"
+      # no op
     end
 
   end
