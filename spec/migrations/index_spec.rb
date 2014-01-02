@@ -30,34 +30,10 @@ describe IndexKing do
     IndexKing.drop_kings
   end
 
-  describe "#add_index" do
-    it "throws an error .... always" do
-      -> {
-        connection.add_index(:kings, "id")
-      }.must_raise(ActiveRecord::StatementInvalid)
-    end
-  end
-
   describe "#index_exists?" do
     it "always says false" do
       connection.index_exists?(:kings, :id).must_equal(false)
       connection.index_exists?(:kings, [ :id, :not_id ]).must_equal(false)
-    end
-  end
-
-  describe "#remove_index" do
-    it "throws an error .... always" do
-      -> {
-        connection.remove_index(:kings, "id")
-      }.must_raise(ArgumentError)
-    end
-  end
-
-  describe "#rename_index" do
-    it "throws an error .... always" do
-      -> {
-        connection.rename_index(:kings, "id", "derp")
-      }.must_raise(ArgumentError)
     end
   end
 end
