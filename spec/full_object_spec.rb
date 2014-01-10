@@ -23,7 +23,6 @@ class CreateFullObject < ::ActiveRecord::Migration
 end
 
 class FullObject < ::ActiveRecord::Base
-  self.sequence_name = "full_objects_id_seq"
 end
 
 describe ::FullObject do

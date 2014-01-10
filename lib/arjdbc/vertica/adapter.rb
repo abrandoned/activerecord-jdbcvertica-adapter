@@ -3,6 +3,18 @@ require 'arjdbc/vertica/column'
 # Load a mapping for the "text" type that will actually work
 ::ActiveRecord::ConnectionAdapters::JdbcTypeConverter::AR_TO_JDBC_TYPES[:text] << lambda { |r| r['type_name'] =~ /varchar$/i }
 
+# Override sequence_name to work without setting explicitly in models
+module ::ActiveRecord
+  class Base
+    def self.sequence_name
+      "#{self.table_name}_#{self.primary_key || 'id'}_seq"
+    end
+  end
+end
+
+##
+# Adapter
+#
 module ::ArJdbc
   module Vertica
     ADAPTER_NAME = 'Vertica'.freeze
