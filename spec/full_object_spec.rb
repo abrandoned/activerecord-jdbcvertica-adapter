@@ -23,6 +23,7 @@ class CreateFullObject < ::ActiveRecord::Migration
 end
 
 class FullObject < ::ActiveRecord::Base
+  self.sequence_name = "full_objects_id_seq"
 end
 
 describe ::FullObject do
@@ -43,6 +44,16 @@ describe ::FullObject do
     specify { subject.must_respond_to(:time) }
     specify { subject.must_respond_to(:date) }
     specify { subject.must_respond_to(:boolean) }
+  end
+
+  describe "#create with id" do
+    it "sets the id if given on create" do
+      subject.id = 123_456
+      subject.string = "string"
+      subject.save
+
+      FullObject.find(123_456).must_equal(subject)
+    end
   end
 
   describe "#delete" do
