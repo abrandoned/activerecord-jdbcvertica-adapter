@@ -23,7 +23,12 @@ module ::ActiveRecord
       records.each do |record|
         values = []
         column_names_without_id.each do |column_name|
-          values << record.__send__("#{column_name}")
+          if ::ArJdbc::Vertica::TIMESTAMP_COLUMNS.include?("#{column_name}")
+            # Set the Timestampt if it is not already set
+            values << (record.__send__("#{column_name}") || ::ArJdbc::Vertica.current_time)
+          else
+            values << record.__send__("#{column_name}")
+          end
         end
         data << values
       end
@@ -56,6 +61,17 @@ module ::ArJdbc
       :boolean     => { :name => "boolean" },
       :xml         => { :name => "xml" }
     }
+
+    TIMESTAMP_COLUMNS = [
+      "created_at",
+      "created_on",
+      "updated_at",
+      "updated_on"
+    ]
+
+    def self.current_time
+      ::ActiveRecord::Base.default_timezone == :utc ? ::Time.now.utc : ::Time.now
+    end
 
     def adapter_name
       ADAPTER_NAME
