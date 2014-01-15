@@ -1,4 +1,5 @@
 require 'arjdbc/vertica/column'
+require 'securerandom'
 
 # Load a mapping for the "text" type that will actually work
 ::ActiveRecord::ConnectionAdapters::JdbcTypeConverter::AR_TO_JDBC_TYPES[:text] << lambda { |r| r['type_name'] =~ /varchar$/i }
@@ -8,6 +9,26 @@ module ::ActiveRecord
   class Base
     def self.sequence_name
       "#{self.table_name}_#{self.primary_key || 'id'}_seq"
+    end
+
+    def self.bulk_insert(columns, data)
+      connection.bulk_insert(self.table_name, self.primary_key, self.sequence_name, columns, data)
+    end
+
+    def self.bulk_insert_records(*records)
+      records.flatten!
+      data = []
+      column_names_without_id = column_names.reject { |name| name == self.primary_key }
+
+      records.each do |record|
+        values = []
+        column_names_without_id.each do |column_name|
+          values << record.__send__("#{column_name}")
+        end
+        data << values
+      end
+
+      bulk_insert(column_names_without_id, data)
     end
   end
 end
@@ -21,7 +42,7 @@ module ::ArJdbc
     INSERT_TABLE_EXTRACTION = /into\s+(?<table_name>[^\(]*).*values\s*\(/im
 
     NATIVE_DATABASE_TYPES = {
-      :primary_key => "integer primary key",
+      :primary_key => "INTEGER NOT NULL PRIMARY KEY",
       :string      => { :name => "varchar", :limit => 255 },
       :text        => { :name => "varchar", :limit => 15000 },
       :integer     => { :name => "integer" },
@@ -44,9 +65,30 @@ module ::ArJdbc
       # no op
     end
 
+    def bulk_insert(table_name, primary_key, sequence_name, column_names, data)
+      sql = "INSERT INTO #{table_name} (#{column_names.join(',')},#{primary_key || 'id'}) #{$/}"
+      row_count = data.size
+      last_index = row_count - 1
+      temp_table_name = vertica_random_temp_table_name
+      column_types = vertica_column_types_for(table_name, column_names)
+
+      sql << "SELECT #{temp_table_name}.*, #{sequence_name}.nextval FROM ("
+      data.each_with_index do |data_row, index|
+        sql << "SELECT #{vertica_bulk_insert_select_for(column_types, data_row)} "
+
+        unless index == last_index
+          sql << "#{$/} UNION ALL #{$/}"
+        end
+      end
+      sql << ") #{temp_table_name};"
+
+      execute(sql)
+    end
+
     def columns(table_name, name = nil)
       sql = "SELECT * from V_CATALOG.COLUMNS WHERE table_name = '#{table_name}';"
       raw_columns = execute(sql, name || "SCHEMA")
+
       columns = raw_columns.map do |raw_column|
         ::ActiveRecord::ConnectionAdapters::VerticaColumn.new(
           raw_column['column_name'],
@@ -172,6 +214,44 @@ module ::ArJdbc
 
     def sequence_name_for(table_name, primary_key_name = nil)
       "#{table_name}_#{primary_key_name || 'id'}_seq"
+    end
+
+    ##
+    # Custom Vertica methods to allow
+    # bulk insert operations on a db engine
+    # that does not support multi-insert
+    def vertica_bulk_insert_select_for(column_types, data_row)
+      insert_values = data_row.each_with_index.map do |value, index|
+        "#{quote(value)}::#{column_types[index]}"
+      end
+
+      return insert_values.join(",")
+    end
+
+    def vertica_column_types_for(table_name, column_names)
+      column_names.map { |column_name| vertica_column_type_for(table_name, column_name) }
+    end
+
+    def vertica_column_type_for(table_name, column_name)
+      column = vertica_memoized_columns(table_name).find { |column| column.name == "#{column_name}" }
+      return column.sql_type if column
+      return nil
+    end
+
+    def vertica_memoized_columns(table_name, name = nil)
+      @vertica_memoized_columns ||= {}
+      normalized_table_name = "#{table_name}"
+
+      unless @vertica_memoized_columns.has_key?(normalized_table_name)
+        @vertica_memoized_columns[normalized_table_name] = columns(table_name, name)
+      end
+
+      return @vertica_memoized_columns[normalized_table_name]
+    end
+
+    def vertica_random_temp_table_name
+      # Generate a Random "table_name" to prevent collisions (not sure if needed)
+      "temporary_table_#{::SecureRandom.hex}"
     end
 
   end
