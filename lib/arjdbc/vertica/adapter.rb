@@ -199,7 +199,7 @@ module ::ArJdbc
       return @primary_keys[table_name] if @primary_keys[table_name]
 
       keys = self.execute("SELECT column_name FROM v_catalog.primary_keys WHERE table_name = '#{table_name}';")
-      @primary_keys[table_name] = [ keys.first['column_name'] ]
+      @primary_keys[table_name] = [ keys.first && keys.first['column_name'] ]
       @primary_keys[table_name]
     end
 
