@@ -1,4 +1,5 @@
 require 'arjdbc/vertica/column'
+require 'arjdbc/util/quoted_cache'
 require 'securerandom'
 
 # Load a mapping for the "text" type that will actually work
@@ -43,6 +44,8 @@ end
 #
 module ::ArJdbc
   module Vertica
+    include ::ArJdbc::Util::QuotedCache
+
     ADAPTER_NAME = 'Vertica'.freeze
     INSERT_TABLE_EXTRACTION = /into\s+(?<table_name>[^\(]*).*values\s*\(/im
 
@@ -209,6 +212,10 @@ module ::ArJdbc
     #
     def quote_table_name_for_assignment(table, attr)
       quote_column_name(attr)
+    end
+
+    def rename_column(table_name, column_name, new_column_name)
+      execute "ALTER TABLE #{quote_table_name(table_name)} RENAME COLUMN #{quote_column_name(column_name)} TO #{quote_column_name(new_column_name)}"
     end
 
     def remove_index(*args)

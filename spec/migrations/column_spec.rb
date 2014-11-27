@@ -106,10 +106,12 @@ describe ColumnKing do
   describe "#rename_column" do
     it "does not rename columns (JDBC)" do 
       connection.add_column(:kings, :name, :string)
-
-      -> {
-        connection.rename_column(:kings, :name, :name2)
-      }.must_raise(NotImplementedError)
+      connection.rename_column(:kings, :name, :name2)
+      connection.column_exists?(:kings, :name2).must_equal(true)
+      connection.column_exists?(:kings, :name).must_equal(false)
+      connection.rename_column(:kings, :name2, :name)
+      connection.column_exists?(:kings, :name2).must_equal(false)
+      connection.column_exists?(:kings, :name).must_equal(true)
     end
   end
 end
