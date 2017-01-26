@@ -35,7 +35,7 @@ module ActiveRecord
         when 14 #, 'time_tz'
           ::ActiveRecord::Type::DateTime.new
         when 16 #, 'numeric', :bigdecimal
-          ::ActiveRecord::Type::Numeric.new
+          ::ActiveRecord::Type::Decimal.new
         when 17 #, 'bytes', :binary_string
           ::ActiveRecord::Type::Binary.new
         when 115 #, 'long varchar', :unicode_string
@@ -68,7 +68,7 @@ module ActiveRecord
         when /time_tz/i
           ::ActiveRecord::Type::DateTime.new
         when /numeric/i # :bigdecimal
-          ::ActiveRecord::Type::Numeric.new
+          ::ActiveRecord::Type::Decimal.new
         when /bytes/i # :binary_string
           ::ActiveRecord::Type::Binary.new
         when /long varchar/i # :unicode_string
