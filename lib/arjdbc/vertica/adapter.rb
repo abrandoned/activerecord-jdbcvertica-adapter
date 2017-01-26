@@ -112,6 +112,7 @@ module ::ArJdbc
         ::ActiveRecord::ConnectionAdapters::VerticaColumn.new(
           raw_column['column_name'],
           raw_column['column_default'],
+          raw_column['data_type_id'],
           raw_column['data_type'],
           raw_column['is_nullable'], 
           raw_column['is_identity']
