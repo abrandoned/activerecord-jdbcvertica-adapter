@@ -53,15 +53,17 @@ module ActiveRecord
           ::ActiveRecord::Type::Integer.new
         when /float/i # :float
           ::ActiveRecord::Type::Float.new
-        when /char/i # :unicode_string
+        when /^char/i # :unicode_string
           ::ActiveRecord::Type::String.new
         when /varchar/i # :unicode_string
           ::ActiveRecord::Type::String.new
+        when /long varchar/i # :unicode_string
+          ::ActiveRecord::Type::String.new
         when /date/i # :date
           ::ActiveRecord::Type::Date.new
-        when  /time/i
+        when /time$/i
           ::ActiveRecord::Type::Time.new
-        when /timestamp/i # :timestamp
+        when /timestamp$/i # :timestamp
           ::ActiveRecord::Type::DateTime.new
         when /timestamp_tz/i # :timestamp
           ::ActiveRecord::Type::DateTime.new
@@ -71,8 +73,6 @@ module ActiveRecord
           ::ActiveRecord::Type::Decimal.new
         when /bytes/i # :binary_string
           ::ActiveRecord::Type::Binary.new
-        when /long varchar/i # :unicode_string
-          ::ActiveRecord::Type::String.new
         else
           nil
         end
