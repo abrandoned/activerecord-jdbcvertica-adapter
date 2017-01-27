@@ -35,8 +35,10 @@ class ActiveRecord::Base
 
   class << self
     # connection methods should be the same 
+    alias_method :vertica8_connection, :vertica5_connection
     alias_method :vertica7_connection, :vertica5_connection
     alias_method :vertica6_connection, :vertica5_connection
+    alias_method :jdbcvertica8_connection, :vertica5_connection
     alias_method :jdbcvertica7_connection, :vertica5_connection
     alias_method :jdbcvertica6_connection, :vertica5_connection
     alias_method :jdbcvertica5_connection, :vertica5_connection

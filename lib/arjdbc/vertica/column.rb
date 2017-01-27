@@ -2,10 +2,80 @@ module ActiveRecord
 
   module ConnectionAdapters
     class VerticaColumn < Column
-      def initialize(name, default, sql_type = nil, null = true, primary_key = false)
-        super(name, self.class.extract_value_from_default(default), sql_type, null)
+      def initialize(name, default, data_type_id, sql_type = nil, null = true, primary_key = false)
+        super(name,
+              self.class.extract_value_from_default(default),
+              self.class.cast_type_from_data_type_id(data_type_id) || self.class.cast_type_from_sql_type(sql_type),
+              sql_type,
+              null)
         # Might need to set if it is primary key below? don't know
         # self.primary = primary_key
+      end
+
+      def self.cast_type_from_data_type_id(data_type_id)
+        case data_type_id
+        when 5 #, 'bool', :bool
+          ::ActiveRecord::Type::Boolean.new
+        when 6 #, 'integer', :integer
+          ::ActiveRecord::Type::Integer.new
+        when 7 #, 'float', :float
+          ::ActiveRecord::Type::Float.new
+        when 8 #, 'char', :unicode_string
+          ::ActiveRecord::Type::String.new
+        when 9 #, 'varchar', :unicode_string
+          ::ActiveRecord::Type::String.new
+        when 10 #, 'date', :date
+          ::ActiveRecord::Type::Date.new
+        when 11 #, 'time'
+          ::ActiveRecord::Type::Time.new
+        when 12 #, 'timestamp', :timestamp
+          ::ActiveRecord::Type::DateTime.new
+        when 13 #, 'timestamp_tz', :timestamp
+          ::ActiveRecord::Type::DateTime.new
+        when 14 #, 'time_tz'
+          ::ActiveRecord::Type::DateTime.new
+        when 16 #, 'numeric', :bigdecimal
+          ::ActiveRecord::Type::Decimal.new
+        when 17 #, 'bytes', :binary_string
+          ::ActiveRecord::Type::Binary.new
+        when 115 #, 'long varchar', :unicode_string
+          ::ActiveRecord::Type::String.new
+        else
+          nil
+        end
+      end
+
+      def self.cast_type_from_sql_type(sql_type)
+        case "#{sql_type}"
+        when /bool/i # :bool
+          ::ActiveRecord::Type::Boolean.new
+        when /integer/i # :integer
+          ::ActiveRecord::Type::Integer.new
+        when /float/i # :float
+          ::ActiveRecord::Type::Float.new
+        when /^char/i # :unicode_string
+          ::ActiveRecord::Type::String.new
+        when /varchar/i # :unicode_string
+          ::ActiveRecord::Type::String.new
+        when /long varchar/i # :unicode_string
+          ::ActiveRecord::Type::String.new
+        when /date/i # :date
+          ::ActiveRecord::Type::Date.new
+        when /time$/i
+          ::ActiveRecord::Type::Time.new
+        when /timestamp$/i # :timestamp
+          ::ActiveRecord::Type::DateTime.new
+        when /timestamp_tz/i # :timestamp
+          ::ActiveRecord::Type::DateTime.new
+        when /time_tz/i
+          ::ActiveRecord::Type::DateTime.new
+        when /numeric/i # :bigdecimal
+          ::ActiveRecord::Type::Decimal.new
+        when /bytes/i # :binary_string
+          ::ActiveRecord::Type::Binary.new
+        else
+          nil
+        end
       end
 
       def self.extract_value_from_default(default)
