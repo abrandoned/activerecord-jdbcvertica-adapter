@@ -18,8 +18,8 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
   gem.licenses      = [ "MIT" ]
 
-  gem.add_dependency "activerecord"
-  gem.add_dependency "activerecord-jdbc-adapter"
+  gem.add_dependency "activerecord", "5.1.6.2"
+  gem.add_dependency "activerecord-jdbc-adapter", "51.2"
 
   gem.add_development_dependency "bundler"
   gem.add_development_dependency "mocha"

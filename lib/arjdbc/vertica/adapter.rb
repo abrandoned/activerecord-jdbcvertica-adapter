@@ -46,30 +46,34 @@ module ::ArJdbc
   module Vertica
     include ::ArJdbc::Util::QuotedCache
 
+    def self.jdbc_connection_class
+      ::ActiveRecord::ConnectionAdapters::JdbcConnection
+    end
+
     ADAPTER_NAME = 'Vertica'.freeze
     INSERT_TABLE_EXTRACTION = /into\s+(?<table_name>[^\(]*).*values\s*\(/im
 
     NATIVE_DATABASE_TYPES = {
-      :primary_key => "INTEGER NOT NULL PRIMARY KEY",
-      :string      => { :name => "varchar", :limit => 255 },
-      :text        => { :name => "varchar", :limit => 15000 },
-      :integer     => { :name => "integer" },
-      :float       => { :name => "float" },
-      :decimal     => { :name => "decimal" },
-      :datetime    => { :name => "datetime" },
-      :timestamp   => { :name => "timestamp" },
-      :time        => { :name => "time" },
-      :date        => { :name => "date" },
-      :binary      => { :name => "bytea" },
-      :boolean     => { :name => "boolean" },
-      :xml         => { :name => "xml" }
+        :primary_key => "INTEGER NOT NULL PRIMARY KEY",
+        :string      => { :name => "varchar", :limit => 255 },
+        :text        => { :name => "varchar", :limit => 15000 },
+        :integer     => { :name => "integer" },
+        :float       => { :name => "float" },
+        :decimal     => { :name => "decimal" },
+        :datetime    => { :name => "datetime" },
+        :timestamp   => { :name => "timestamp" },
+        :time        => { :name => "time" },
+        :date        => { :name => "date" },
+        :binary      => { :name => "bytea" },
+        :boolean     => { :name => "boolean" },
+        :xml         => { :name => "xml" }
     }
 
     TIMESTAMP_COLUMNS = [
-      "created_at",
-      "created_on",
-      "updated_at",
-      "updated_on"
+        "created_at",
+        "created_on",
+        "updated_at",
+        "updated_on"
     ]
 
     def self.current_time
@@ -110,12 +114,12 @@ module ::ArJdbc
 
       columns = raw_columns.map do |raw_column|
         ::ActiveRecord::ConnectionAdapters::VerticaColumn.new(
-          raw_column['column_name'],
-          raw_column['column_default'],
-          raw_column['data_type_id'],
-          raw_column['data_type'],
-          raw_column['is_nullable'], 
-          raw_column['is_identity']
+            raw_column['column_name'],
+            raw_column['column_default'],
+            raw_column['data_type_id'],
+            raw_column['data_type'],
+            raw_column['is_nullable'],
+            raw_column['is_identity']
         )
       end
 
@@ -162,7 +166,7 @@ module ::ArJdbc
 
     ##
     # Vertica JDBC does not work with JDBC GET_GENERATED_KEYS
-    # so we need to execute the sql raw and then lookup the 
+    # so we need to execute the sql raw and then lookup the
     # LAST_INSERT_ID() that occurred in this "session"
     #
     def exec_insert(sql, name, binds, primary_key = nil, sequence_name = nil)
@@ -177,7 +181,7 @@ module ::ArJdbc
 
     def native_database_types
       NATIVE_DATABASE_TYPES
-    end 
+    end
 
     def next_insert_id_for(sequence_name)
       return select_value("SELECT NEXTVAL('#{sequence_name}');")
@@ -284,5 +288,19 @@ end
 module ActiveRecord::ConnectionAdapters
   class VerticaAdapter < JdbcAdapter
     include ::ArJdbc::Vertica
+    def initialize(connection, logger = nil, connection_parameters = nil, config = {})
+
+
+      super(connection, logger, config) # configure_connection happens in super
+
+      initialize_type_map(@type_map = ::ActiveRecord::Type::HashLookupTypeMap.new)
+
+    end
+
+    def jdbc_connection_class(spec)
+      ::ArJdbc::Vertica.jdbc_connection_class
+    end
+
+
   end
 end
