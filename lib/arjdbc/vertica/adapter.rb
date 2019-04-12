@@ -54,26 +54,26 @@ module ::ArJdbc
     INSERT_TABLE_EXTRACTION = /into\s+(?<table_name>[^\(]*).*values\s*\(/im
 
     NATIVE_DATABASE_TYPES = {
-        :primary_key => "INTEGER NOT NULL PRIMARY KEY",
-        :string      => { :name => "varchar", :limit => 255 },
-        :text        => { :name => "varchar", :limit => 15000 },
-        :integer     => { :name => "integer" },
-        :float       => { :name => "float" },
-        :decimal     => { :name => "decimal" },
-        :datetime    => { :name => "datetime" },
-        :timestamp   => { :name => "timestamp" },
-        :time        => { :name => "time" },
-        :date        => { :name => "date" },
-        :binary      => { :name => "bytea" },
-        :boolean     => { :name => "boolean" },
-        :xml         => { :name => "xml" }
+      :primary_key => "INTEGER NOT NULL PRIMARY KEY",
+      :string      => { :name => "varchar", :limit => 255 },
+      :text        => { :name => "varchar", :limit => 15000 },
+      :integer     => { :name => "integer" },
+      :float       => { :name => "float" },
+      :decimal     => { :name => "decimal" },
+      :datetime    => { :name => "datetime" },
+      :timestamp   => { :name => "timestamp" },
+      :time        => { :name => "time" },
+      :date        => { :name => "date" },
+      :binary      => { :name => "bytea" },
+      :boolean     => { :name => "boolean" },
+      :xml         => { :name => "xml" }
     }
 
     TIMESTAMP_COLUMNS = [
-        "created_at",
-        "created_on",
-        "updated_at",
-        "updated_on"
+      "created_at",
+      "created_on",
+      "updated_at",
+      "updated_on"
     ]
 
     def self.current_time
@@ -114,12 +114,12 @@ module ::ArJdbc
 
       columns = raw_columns.map do |raw_column|
         ::ActiveRecord::ConnectionAdapters::VerticaColumn.new(
-            raw_column['column_name'],
-            raw_column['column_default'],
-            raw_column['data_type_id'],
-            raw_column['data_type'],
-            raw_column['is_nullable'],
-            raw_column['is_identity']
+          raw_column['column_name'],
+          raw_column['column_default'],
+          raw_column['data_type_id'],
+          raw_column['data_type'],
+          raw_column['is_nullable'],
+          raw_column['is_identity']
         )
       end
 
@@ -289,18 +289,12 @@ module ActiveRecord::ConnectionAdapters
   class VerticaAdapter < JdbcAdapter
     include ::ArJdbc::Vertica
     def initialize(connection, logger = nil, connection_parameters = nil, config = {})
-
-
       super(connection, logger, config) # configure_connection happens in super
-
       initialize_type_map(@type_map = ::ActiveRecord::Type::HashLookupTypeMap.new)
-
     end
 
     def jdbc_connection_class(spec)
       ::ArJdbc::Vertica.jdbc_connection_class
     end
-
-
   end
 end
