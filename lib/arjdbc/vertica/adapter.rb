@@ -45,10 +45,13 @@ end
 module ::ArJdbc
   module Vertica
     include ::ArJdbc::Util::QuotedCache
-
+    require 'arjdbc/vertica/column'
     def self.jdbc_connection_class
       ::ActiveRecord::ConnectionAdapters::JdbcConnection
     end
+
+    # @see ActiveRecord::ConnectionAdapters::JdbcAdapter#jdbc_column_class
+    def jdbc_column_class; ::ActiveRecord::ConnectionAdapters::VerticaColumn end
 
     ADAPTER_NAME = 'Vertica'.freeze
     INSERT_TABLE_EXTRACTION = /into\s+(?<table_name>[^\(]*).*values\s*\(/im
@@ -106,24 +109,6 @@ module ::ArJdbc
       sql << ") #{temp_table_name};"
 
       execute(sql)
-    end
-
-    def columns(table_name, name = nil)
-      sql = "SELECT * from V_CATALOG.COLUMNS WHERE table_name = '#{table_name}';"
-      raw_columns = execute(sql, name || "SCHEMA")
-
-      columns = raw_columns.map do |raw_column|
-        ::ActiveRecord::ConnectionAdapters::VerticaColumn.new(
-          raw_column['column_name'],
-          raw_column['column_default'],
-          raw_column['data_type_id'],
-          raw_column['data_type'],
-          raw_column['is_nullable'],
-          raw_column['is_identity']
-        )
-      end
-
-      return columns
     end
 
     ##
@@ -290,7 +275,6 @@ module ActiveRecord::ConnectionAdapters
     include ::ArJdbc::Vertica
     def initialize(connection, logger = nil, connection_parameters = nil, config = {})
       super(connection, logger, config) # configure_connection happens in super
-      initialize_type_map(@type_map = ::ActiveRecord::Type::HashLookupTypeMap.new)
     end
 
     def jdbc_connection_class(spec)
