@@ -79,6 +79,25 @@ module ::ArJdbc
       "updated_on"
     ]
 
+    def columns(table_name, name = nil)
+      sql = "SELECT * from V_CATALOG.COLUMNS WHERE table_name = '#{table_name}';"
+      raw_columns = execute(sql, name || "SCHEMA")
+
+      columns = raw_columns.map do |raw_column|
+        ::ActiveRecord::ConnectionAdapters::VerticaColumn.new(
+            raw_column['column_name'],
+            raw_column['column_default'],
+            raw_column['data_type_id'],
+            raw_column['table_name'],
+            raw_column['data_type'],
+            raw_column['is_nullable'],
+            raw_column['is_identity']
+        )
+      end
+
+      return columns
+    end
+
     def self.current_time
       ::ActiveRecord::Base.default_timezone == :utc ? ::Time.now.utc : ::Time.now
     end
