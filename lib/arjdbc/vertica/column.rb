@@ -17,7 +17,7 @@ module ActiveRecord
         when 5 #, 'bool', :bool
           ::ActiveRecord::Type::Boolean.new
         when 6 #, 'integer', :integer
-          ::ActiveRecord::Type::Integer.new
+          ::ActiveRecord::Type::BigInteger.new
         when 7 #, 'float', :float
           ::ActiveRecord::Type::Float.new
         when 8 #, 'char', :unicode_string
