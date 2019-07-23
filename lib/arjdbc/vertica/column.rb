@@ -50,7 +50,7 @@ module ActiveRecord
         when /bool/i # :bool
           ::ActiveRecord::Type::Boolean.new
         when /integer/i # :integer
-          ::ActiveRecord::Type::Integer.new
+          ::ActiveRecord::Type::BigInteger.new
         when /float/i # :float
           ::ActiveRecord::Type::Float.new
         when /^char/i # :unicode_string
