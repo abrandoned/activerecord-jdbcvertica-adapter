@@ -278,6 +278,12 @@ module ::ArJdbc
       "temporary_table_#{::SecureRandom.hex}"
     end
 
+    def type_to_sql(type, limit = nil, precision = nil, scale = nil) #:nodoc:
+      super unless type.to_sym == :integer
+
+      native_database_types[:integer][:name].dup
+    end
+
   end
 end
 
