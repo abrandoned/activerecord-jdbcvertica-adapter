@@ -279,7 +279,7 @@ module ::ArJdbc
     end
 
     def type_to_sql(type, limit = nil, precision = nil, scale = nil) #:nodoc:
-      super unless type == :integer
+      super unless type.to_sym == :integer
 
       if native = native_database_types[type.to_sym]
         (native.is_a?(Hash) ? native[:name] : native).dup
