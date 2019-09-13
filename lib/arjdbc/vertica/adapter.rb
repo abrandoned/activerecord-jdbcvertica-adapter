@@ -54,6 +54,7 @@ module ::ArJdbc
       :string      => { :name => "varchar", :limit => 255 },
       :text        => { :name => "varchar", :limit => 15000 },
       :integer     => { :name => "integer" },
+      :bigserial   => { :name => "integer" },
       :float       => { :name => "float" },
       :decimal     => { :name => "decimal" },
       :datetime    => { :name => "datetime" },
@@ -279,7 +280,7 @@ module ::ArJdbc
     end
 
     def type_to_sql(type, limit = nil, precision = nil, scale = nil) #:nodoc:
-      super unless type.to_sym == :integer
+      super unless (type.to_sym == :integer || type.to_sym == :bigserial)
 
       if native = native_database_types[type.to_sym]
         (native.is_a?(Hash) ? native[:name] : native).dup
