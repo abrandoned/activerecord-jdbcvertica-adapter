@@ -1,0 +1,30 @@
+# Use the latest 2.1 version of CircleCI pipeline processing engine, see https://circleci.com/docs/2.0/configuration-reference/
+version: 2.0
+
+jobs:
+  build:
+    docker:
+      - image: circleci/jruby:9.1.17.0-jdk
+        environment:
+          BUNDLER_VERSION: 1.17.3
+      - image: jbfavre/vertica:latest
+        environment:
+          DATABASE_ADAPTER: vertica5
+          DATABASE_USERNAME: dbadmin
+          DATABASE_NAME: docker
+          DATABASE_HOST: 127.0.0.1
+          DATABASE_PORT: 5433
+    steps:
+      - checkout
+      - run:
+          name: Configure Bundler
+          command: |
+            gem install bundler -v 1.17.3
+      - run:
+          name: Bundle Install
+          command: |
+            bundle _1.17.3_ install
+      - run:
+          name: tests
+          command: |
+            bundle exec rake test
