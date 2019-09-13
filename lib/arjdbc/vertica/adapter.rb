@@ -54,6 +54,7 @@ module ::ArJdbc
       :string      => { :name => "varchar", :limit => 255 },
       :text        => { :name => "varchar", :limit => 15000 },
       :integer     => { :name => "integer" },
+      :bigserial   => { :name => "integer" },
       :float       => { :name => "float" },
       :decimal     => { :name => "decimal" },
       :datetime    => { :name => "datetime" },
@@ -257,7 +258,7 @@ module ::ArJdbc
     end
 
     def vertica_column_type_for(table_name, column_name)
-      column = vertica_memoized_columns(table_name).find { |column| column.name == "#{column_name}" }
+      column = vertica_memoized_columns(table_name).find { |col| col.name == "#{column_name}" }
       return column.sql_type if column
       return nil
     end
@@ -279,9 +280,13 @@ module ::ArJdbc
     end
 
     def type_to_sql(type, limit = nil, precision = nil, scale = nil) #:nodoc:
-      super unless type.to_sym == :integer
+      super unless (type.to_sym == :integer || type.to_sym == :bigserial)
 
-      native_database_types[:integer][:name].dup
+      if native = native_database_types[type.to_sym]
+        (native.is_a?(Hash) ? native[:name] : native).dup
+      else
+        type.to_s
+      end
     end
 
   end
