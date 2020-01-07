@@ -1,4 +1,4 @@
-require 'spec_helper'
+require_relative './spec_helper.rb'
 
 class CreateFullObject < ActiveRecord::Migration[5.1]
   def self.up
@@ -33,16 +33,18 @@ describe ::FullObject do
     CreateFullObject.up
   end
 
-  describe "API" do 
-    specify { subject.must_respond_to(:string) }
-    specify { subject.must_respond_to(:text) }
-    specify { subject.must_respond_to(:integer) }
-    specify { subject.must_respond_to(:float) }
-    specify { subject.must_respond_to(:decimal) }
-    specify { subject.must_respond_to(:datetime) }
-    specify { subject.must_respond_to(:time) }
-    specify { subject.must_respond_to(:date) }
-    specify { subject.must_respond_to(:boolean) }
+  describe "API" do
+    it "must respond" do
+      _(_(subject).must_respond_to(:string))
+      # specify { subject.must_respond_to(:text) }
+      # specify { subject.must_respond_to(:integer) }
+      # specify { subject.must_respond_to(:float) }
+      # specify { subject.must_respond_to(:decimal) }
+      # specify { subject.must_respond_to(:datetime) }
+      # specify { subject.must_respond_to(:time) }
+      # specify { subject.must_respond_to(:date) }
+      # specify { subject.must_respond_to(:boolean) }
+    end
   end
 
   describe "#create with id" do

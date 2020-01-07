@@ -74,10 +74,10 @@ module ::ArJdbc
     }
 
     TIMESTAMP_COLUMNS = [
-      "created_at",
-      "created_on",
-      "updated_at",
-      "updated_on"
+        "created_at",
+        "created_on",
+        "updated_at",
+        "updated_on"
     ]
 
     def columns(table_name, name = nil)
@@ -266,7 +266,7 @@ module ::ArJdbc
     end
 
     def vertica_column_type_for(table_name, column_name)
-      column = vertica_memoized_columns(table_name).find { |col| col.name == "#{column_name}" }
+      column = vertica_memoized_columns(table_name).find { |column| column.name == "#{column_name}" }
       return column.sql_type if column
       return nil
     end
@@ -285,16 +285,6 @@ module ::ArJdbc
     def vertica_random_temp_table_name
       # Generate a Random "table_name" to prevent collisions (not sure if needed)
       "temporary_table_#{::SecureRandom.hex}"
-    end
-
-    def type_to_sql(type, limit = nil, precision = nil, scale = nil) #:nodoc:
-      super unless (type.to_sym == :integer || type.to_sym == :bigserial)
-
-      if native = native_database_types[type.to_sym]
-        (native.is_a?(Hash) ? native[:name] : native).dup
-      else
-        type.to_s
-      end
     end
 
   end
