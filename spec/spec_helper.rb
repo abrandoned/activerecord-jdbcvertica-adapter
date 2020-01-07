@@ -9,8 +9,5 @@ require 'minitest/pride'
 
 require 'mocha/api'
 
-config = YAML.load_file(File.dirname(File.expand_path(__FILE__)) + "/test_connection.yml")
+ActiveRecord::Base.establish_connection({"adapter"=>"vertica5", "encoding"=>"utf8", "host"=>"localhost", "port"=>5433, "username"=>"dbadmin", "database"=>"docker"})
 
-ActiveRecord::Base.establish_connection(
-  config['development']
-)

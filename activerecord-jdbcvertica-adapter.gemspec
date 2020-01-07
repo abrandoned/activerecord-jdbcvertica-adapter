@@ -17,11 +17,9 @@ Gem::Specification.new do |gem|
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ["lib"]
   gem.licenses      = [ "MIT" ]
-
   gem.add_dependency "activerecord", "5.1.6.2"
   gem.add_dependency "activerecord-jdbc-adapter", "51.2"
 
-  gem.add_development_dependency "bundler"
   gem.add_development_dependency "mocha"
   gem.add_development_dependency "pry"
   gem.add_development_dependency "rake"
