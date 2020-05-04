@@ -12,6 +12,7 @@ class CreateFullObject < ActiveRecord::Migration[5.1]
       t.time :time
       t.date :date
       t.boolean :boolean
+      t.integer :bigserial
     end
   end
 
@@ -36,14 +37,15 @@ describe ::FullObject do
   describe "API" do
     it "must respond" do
       _(_(subject).must_respond_to(:string))
-      # specify { subject.must_respond_to(:text) }
-      # specify { subject.must_respond_to(:integer) }
-      # specify { subject.must_respond_to(:float) }
-      # specify { subject.must_respond_to(:decimal) }
-      # specify { subject.must_respond_to(:datetime) }
-      # specify { subject.must_respond_to(:time) }
-      # specify { subject.must_respond_to(:date) }
-      # specify { subject.must_respond_to(:boolean) }
+      _(_(subject).must_respond_to(:text))
+      _(_(subject).must_respond_to(:integer))
+      _(_(subject).must_respond_to(:float))
+      _(_(subject).must_respond_to(:decimal))
+      _(_(subject).must_respond_to(:datetime))
+      _(_(subject).must_respond_to(:time))
+      _(_(subject).must_respond_to(:date))
+      _(_(subject).must_respond_to(:boolean))
+      _(_(subject).must_respond_to(:bigserial))
     end
   end
 

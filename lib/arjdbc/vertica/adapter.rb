@@ -91,6 +91,7 @@ module ::ArJdbc
             raw_column['data_type_id'],
             raw_column['table_name'],
             raw_column['data_type'],
+            fetch_type_metadata(raw_column['data_type']),
             raw_column['is_nullable'],
             raw_column['is_identity']
         )

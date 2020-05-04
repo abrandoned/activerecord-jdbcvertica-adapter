@@ -2,10 +2,10 @@ module ActiveRecord
 
   module ConnectionAdapters
     class VerticaColumn < Column
-      def initialize(name, default, data_type_id, table_name, sql_type = nil, null = true, default_function = nil, primary_key = false)
+      def initialize(name, default, data_type_id, table_name, sql_type = nil, sql_meta_data = nil, null = true, default_function = nil, primary_key = false)
         super(name,
               default = self.class.extract_value_from_default(default),
-              self.class.sql_type_metadata(sql_type, data_type_id),
+              sql_meta_data,
               null,
               table_name
         )
@@ -24,7 +24,7 @@ module ActiveRecord
         when 5 #, 'bool', :bool
           ::ActiveRecord::Type::Boolean.new
         when 6 #, 'integer', :integer
-          ::ActiveRecord::Type::Integer.new
+          ::ActiveRecord::Type::BigInteger.new
         when 7 #, 'float', :float
           ::ActiveRecord::Type::Float.new
         when 8 #, 'char', :unicode_string
@@ -57,7 +57,7 @@ module ActiveRecord
         when /bool/i # :bool
           ::ActiveRecord::Type::Boolean.new
         when /integer/i # :integer
-          ::ActiveRecord::Type::Integer.new
+          ::ActiveRecord::Type::BigInteger.new
         when /float/i # :float
           ::ActiveRecord::Type::Float.new
         when /^char/i # :unicode_string
