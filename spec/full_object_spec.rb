@@ -1,4 +1,4 @@
-require_relative './spec_helper.rb'
+require 'spec_helper'
 
 class CreateFullObject < ActiveRecord::Migration[5.1]
   def self.up
