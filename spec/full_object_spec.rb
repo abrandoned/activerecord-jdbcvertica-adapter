@@ -1,18 +1,18 @@
-require 'spec_helper'
+require_relative './spec_helper.rb'
 
 class CreateFullObject < ActiveRecord::Migration[5.1]
   def self.up
-    create_table :full_objects do |t|
-      t.string :string
+    create_table :full_objects, :id => :bigserial do |t|
+      t.string :string, :limit => 40
       t.text :text
       t.integer :integer
+      t.bigint :biginteger
       t.float :float
       t.decimal :decimal
       t.datetime :datetime
       t.time :time
       t.date :date
       t.boolean :boolean
-      t.integer :bigserial
     end
   end
 
@@ -34,8 +34,10 @@ describe ::FullObject do
     CreateFullObject.up
   end
 
+
   describe "API" do
     it "must respond" do
+      _(_(subject).must_respond_to(:id))
       _(_(subject).must_respond_to(:string))
       _(_(subject).must_respond_to(:text))
       _(_(subject).must_respond_to(:integer))
@@ -45,7 +47,7 @@ describe ::FullObject do
       _(_(subject).must_respond_to(:time))
       _(_(subject).must_respond_to(:date))
       _(_(subject).must_respond_to(:boolean))
-      _(_(subject).must_respond_to(:bigserial))
+      _(_(subject).must_respond_to(:biginteger))
     end
   end
 
@@ -60,7 +62,7 @@ describe ::FullObject do
   end
 
   describe "#delete" do
-    it "deletes a persisted record" do 
+    it "deletes a persisted record" do
       subject.string = "string"
       subject.save
 
@@ -71,7 +73,7 @@ describe ::FullObject do
   end
 
   describe "#delete_all" do
-    it "deletes a persisted record" do 
+    it "deletes a persisted record" do
       subject.string = "string"
       subject.save
 
@@ -82,7 +84,7 @@ describe ::FullObject do
   end
 
   describe "#insert" do
-    it "string" do 
+    it "string" do
       subject.string = "string"
       subject.save
 
@@ -90,7 +92,7 @@ describe ::FullObject do
       retrieved.string.must_equal(subject.string)
     end
 
-    it "text" do 
+    it "text" do
       subject.text = "text"
       subject.save
 
@@ -98,7 +100,7 @@ describe ::FullObject do
       retrieved.text.must_equal(subject.text)
     end
 
-    it "integer" do 
+    it "integer" do
       subject.integer = 1234
       subject.save
 
@@ -106,7 +108,7 @@ describe ::FullObject do
       retrieved.integer.must_equal(subject.integer)
     end
 
-    it "float" do 
+    it "float" do
       subject.float = 1234.4321
       subject.save
 
@@ -114,7 +116,7 @@ describe ::FullObject do
       retrieved.float.must_equal(subject.float)
     end
 
-    it "decimal" do 
+    it "decimal" do
       subject.decimal = 1234.4321
       subject.save
 
@@ -122,7 +124,7 @@ describe ::FullObject do
       retrieved.decimal.must_equal(subject.decimal)
     end
 
-    it "datetime" do 
+    it "datetime" do
       subject.datetime = Time.current.utc
       subject.save
 
@@ -130,7 +132,7 @@ describe ::FullObject do
       retrieved.datetime.to_s.must_equal(subject.datetime.to_s)
     end
 
-    it "time" do 
+    it "time" do
       subject.time = Time.current.utc
       subject.save
 
@@ -138,7 +140,7 @@ describe ::FullObject do
       retrieved.time.strftime("%H%M%S").must_equal(subject.time.strftime("%H%M%S"))
     end
 
-    it "date" do 
+    it "date" do
       subject.date = Time.current
       subject.save
 
@@ -146,7 +148,7 @@ describe ::FullObject do
       retrieved.date.must_equal(subject.date)
     end
 
-    it "boolean (false)" do 
+    it "boolean (false)" do
       subject.boolean = false
       subject.save
 
@@ -154,7 +156,7 @@ describe ::FullObject do
       retrieved.boolean.must_equal(subject.boolean)
     end
 
-    it "boolean (true)" do 
+    it "boolean (true)" do
       subject.boolean = true
       subject.save
 
@@ -164,7 +166,7 @@ describe ::FullObject do
   end
 
   describe "#update" do
-    it "string" do 
+    it "string" do
       change_to = "string2"
       subject.string = "string"
       subject.save
@@ -174,7 +176,7 @@ describe ::FullObject do
       retrieved.reload.string.must_equal(change_to)
     end
 
-    it "text" do 
+    it "text" do
       change_to = "text2"
       subject.text = "text"
       subject.save
@@ -184,7 +186,7 @@ describe ::FullObject do
       retrieved.reload.text.must_equal(change_to)
     end
 
-    it "integer" do 
+    it "integer" do
       change_to = 4321
       subject.integer = 1234
       subject.save
@@ -194,7 +196,7 @@ describe ::FullObject do
       retrieved.reload.integer.must_equal(change_to)
     end
 
-    it "float" do 
+    it "float" do
       change_to = 4321.1234
       subject.float = 1234.4321
       subject.save
@@ -204,7 +206,7 @@ describe ::FullObject do
       retrieved.reload.float.must_equal(change_to)
     end
 
-    it "decimal" do 
+    it "decimal" do
       change_to = 4321.1234
       subject.decimal = 1234.4321
       subject.save
@@ -214,7 +216,7 @@ describe ::FullObject do
       retrieved.reload.decimal.must_equal(change_to)
     end
 
-    it "datetime" do 
+    it "datetime" do
       change_to = Time.new(2010).utc
       subject.datetime = Time.current.utc
       subject.save
@@ -224,7 +226,7 @@ describe ::FullObject do
       retrieved.reload.datetime.to_s.must_equal(change_to.to_s)
     end
 
-    it "time" do 
+    it "time" do
       change_to = Time.new(2010).utc
       subject.time = Time.current.utc
       subject.save
@@ -234,7 +236,7 @@ describe ::FullObject do
       retrieved.reload.time.strftime("%H%M%S").must_equal(change_to.strftime("%H%M%S"))
     end
 
-    it "date" do 
+    it "date" do
       change_to = Time.new(2010).utc
       subject.date = Time.current
       subject.save
@@ -244,7 +246,7 @@ describe ::FullObject do
       retrieved.reload.date.strftime("%Y%m%d").must_equal(change_to.strftime("%Y%m%d"))
     end
 
-    it "boolean (false)" do 
+    it "boolean (false)" do
       change_to = true
       subject.boolean = false
       subject.save
@@ -254,7 +256,7 @@ describe ::FullObject do
       retrieved.reload.boolean.must_equal(change_to)
     end
 
-    it "boolean (true)" do 
+    it "boolean (true)" do
       change_to = false
       subject.boolean = true
       subject.save
@@ -279,6 +281,36 @@ describe ::FullObject do
       FullObject.where(:boolean => false).update_all(:boolean => true)
       FullObject.where(:boolean => false).count.must_equal(0)
       FullObject.where(:boolean => true).count.must_equal(2)
+    end
+  end
+
+  describe "test column data" do
+    it "correctly assigns all integers as bigint column data" do
+      int_column_names = ["id","integer","biginteger"]
+      int_columns = FullObject.columns.select{|column| int_column_names.include?(column.name)}
+      model = FullObject
+      id_column = FullObject.columns.first
+      _(id_column.name).must_equal("id")
+      _(id_column.table_name).must_equal(model.table_name)
+      _(id_column.null).must_equal(false)
+
+      int_columns.each do |int_column|
+        _(int_column.sql_type_metadata.limit).must_equal(8)
+        _(int_column.sql_type_metadata.sql_type).must_equal("bigint")
+        _(int_column.sql_type_metadata.type).must_equal(:integer)
+      end
+
+    end
+
+    it "correctly assigns non integer column data" do
+      model = FullObject
+      id_column = FullObject.columns.second
+      _(id_column.table_name).must_equal(model.table_name)
+      _(id_column.name).must_equal("string")
+      _(id_column.sql_type_metadata.limit).must_equal(40)
+      _(id_column.sql_type_metadata.sql_type).must_equal("varchar(40)")
+      _(id_column.sql_type_metadata.type).must_equal(:string)
+      _(id_column.null).must_equal(true)
     end
   end
 end
