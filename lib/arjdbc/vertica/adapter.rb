@@ -293,6 +293,49 @@ module ::ArJdbc
   end
 end
 
+module ActiveRecord
+  module ConnectionAdapters
+    class AbstractAdapter
+      class SchemaCreation
+        include ::ArJdbc::Vertica
+        def type_to_sql(type, limit: nil, precision: nil, scale: nil, **) # :nodoc:
+          type = type.to_sym if type
+
+          if native = native_database_types[type]
+            column_type_sql = (native.is_a?(Hash) ? native[:name] : native).dup
+            if type == :decimal # ignore limit, use precision and scale
+              scale ||= native[:scale]
+
+              if precision ||= native[:precision]
+                if scale
+                  column_type_sql << "(#{precision},#{scale})"
+                else
+                  column_type_sql << "(#{precision})"
+                end
+              elsif scale
+                raise ArgumentError, "Error adding decimal column: precision cannot be empty if scale is specified"
+              end
+
+            elsif [:datetime, :timestamp, :time, :interval].include?(type) && precision ||= native[:precision]
+              if (0..6) === precision
+                column_type_sql << "(#{precision})"
+              else
+                raise(ActiveRecordError, "No #{native[:name]} type has precision of #{precision}. The allowed range of precision is from 0 to 6")
+              end
+            elsif (type != :primary_key && type != :integer)  && (limit ||= native.is_a?(Hash) && native[:limit])
+              column_type_sql << "(#{limit})"
+            end
+
+            column_type_sql
+          else
+            type.to_s
+          end
+        end
+      end
+    end
+  end
+end
+
 module ActiveRecord::ConnectionAdapters
   class VerticaAdapter < JdbcAdapter
     include ::ArJdbc::Vertica

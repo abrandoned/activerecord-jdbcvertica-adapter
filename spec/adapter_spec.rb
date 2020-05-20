@@ -3,13 +3,15 @@ require_relative './spec_helper.rb'
 class CreateTestObject < ActiveRecord::Migration[5.1]
   def self.up
     create_table :test_objects, :id => :bigserial do |t|
-      t.string :string, limit: 40
-      t.string :limit_40_string
+      t.string :string
+      t.string :limit_40_string, limit: 40
       t.text :text
       t.integer :integer
+      t.integer :limit_integer, limit: 8
       t.bigint :big_integer
       t.float :float
       t.decimal :decimal
+      t.decimal :decimal_with_scale_and_precision, precision: 14, scale: 2
       t.datetime :datetime
       t.time :time
       t.date :date
@@ -59,13 +61,21 @@ describe ::TestObject do
 
     it "correctly assigns non integer column data" do
       model = TestObject
-      id_column = TestObject.columns.second
-      _(id_column.table_name).must_equal(model.table_name)
-      _(id_column.name).must_equal("string")
-      _(id_column.sql_type_metadata.limit).must_equal(40)
-      _(id_column.sql_type_metadata.sql_type).must_equal("varchar(40)")
-      _(id_column.sql_type_metadata.type).must_equal(:string)
-      _(id_column.null).must_equal(true)
+      string_column = TestObject.columns.second
+      _(string_column.table_name).must_equal(model.table_name)
+      _(string_column.name).must_equal("string")
+      _(string_column.sql_type_metadata.limit).must_equal(255)
+      _(string_column.sql_type_metadata.sql_type).must_equal("varchar(255)")
+      _(string_column.sql_type_metadata.type).must_equal(:string)
+      _(string_column.null).must_equal(true)
+
+      string_limited_column = TestObject.columns.third
+      _(string_limited_column.table_name).must_equal(model.table_name)
+      _(string_limited_column.name).must_equal("limit_40_string")
+      _(string_limited_column.sql_type_metadata.limit).must_equal(40)
+      _(string_limited_column.sql_type_metadata.sql_type).must_equal("varchar(40)")
+      _(string_limited_column.sql_type_metadata.type).must_equal(:string)
+      _(string_limited_column.null).must_equal(true)
     end
   end
 end
