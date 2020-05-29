@@ -98,8 +98,6 @@ module ::ArJdbc
             raw_column['is_identity']
         )
       end
-
-      return columns
     end
 
     def self.current_time
@@ -269,7 +267,7 @@ module ::ArJdbc
     end
 
     def vertica_column_type_for(table_name, column_name)
-      column = vertica_memoized_columns(table_name).find { |column| column.name == "#{column_name}" }
+      column = vertica_memoized_columns(table_name).find { |col| col.name == "#{column_name}" }
       return column.sql_type if column
       return nil
     end
