@@ -344,5 +344,12 @@ module ActiveRecord::ConnectionAdapters
     def jdbc_connection_class(spec)
       ::ArJdbc::Vertica.jdbc_connection_class
     end
+
+    def initialize_type_map(m = type_map)
+      super
+      m.register_type(%r(int)i) do
+        ActiveRecord::Type::Integer.new(limit: 8)
+      end
+    end
   end
 end
