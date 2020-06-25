@@ -283,9 +283,12 @@ module ::ArJdbc
       super unless (type.to_sym == :integer || type.to_sym == :bigserial)
 
       if native = native_database_types[type.to_sym]
-        (native.is_a?(Hash) ? native[:name] : native).dup
-      else
-        type.to_s
+        if native.is_a?(Hash)
+          type, limit = native[:name], native[:limit]
+          super
+        else
+          native.to_s
+        end
       end
     end
 
