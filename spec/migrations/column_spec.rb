@@ -60,6 +60,12 @@ describe ColumnKing do
       has_column_typed?(:queen_id, /int/i).must_equal(true)
     end
 
+    it "creates :bigint columns as :integer" do
+      connection.add_column(:kings, :queen_bigint, :bigint)
+      has_column?(:queen_bigint).must_equal(true)
+      has_column_typed?(:queen_bigint, /int/i).must_equal(true)
+    end
+
     it "creates :string columns (as varchar)" do
       connection.add_column(:kings, :name, :string)
       has_column?(:name).must_equal(true)
