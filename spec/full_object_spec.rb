@@ -302,7 +302,7 @@ describe ::FullObject do
 
     end
 
-    it "correctly assigns non integer column data" do
+    it "correctly assigns string with limit column data" do
       model = FullObject
       id_column = FullObject.columns.second
       _(id_column.table_name).must_equal(model.table_name)
@@ -313,7 +313,7 @@ describe ::FullObject do
       _(id_column.null).must_equal(true)
     end
 
-    it "correctly assigns non integer column data" do
+    it "correctly assigns text column data" do
       model = FullObject
       id_column = FullObject.columns.third
       _(id_column.table_name).must_equal(model.table_name)
