@@ -1,5 +1,5 @@
 # Activerecord::Jdbcvertica::Adapter
-ActiveRecord adapter for Vertica databases (version 5,6,7) that works on Jruby with Vertica JDBC adapter
+ActiveRecord adapter for Vertica databases that works on JRuby with Vertica JDBC adapter
 
 ## Installation
 
@@ -16,6 +16,32 @@ Or install it yourself as:
     $ gem install activerecord-jdbcvertica-adapter
 
 ## Usage
+
+### Unit Tests
+
+1. Run a local Vertica instance via Docker Compose
+   1. Create a directory (e.g. `vertica`) and create a `docker-compose.yml` file with the following contents
+
+```yml
+# docker-compose.yml
+
+version: "3"
+services:
+  db:
+    image: jbfavre/vertica:latest
+    environment:
+      - DATABASE_ADAPTER=vertica5
+      - DATABASE_USERNAME=dbadmin
+      - DATABASE_NAME=docker
+      - DATABASE_HOST=127.0.0.1
+      - DATABASE_PORT=5433
+    ports:
+      - "5433:5433"
+```
+
+2. Run `docker-compose up`
+3. Switch to the `activerecord-jdbcvertica-adapter` project directory
+4. Run `rake` to run the tests
 
 ## Contributing
 
