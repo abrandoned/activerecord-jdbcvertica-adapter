@@ -36,11 +36,6 @@ describe ColumnKing do
       columns.find { |column| column.name == "#{name}" }.sql_type =~ type)
   end
 
-  def has_column_limit?(name, type, limit)
-    !!(has_column_typed?(name, type) &&
-      columns.find { |column| column.name == "#{name}" }.sql_type.to_s.gsub(/\D/, "").to_i == limit)
-  end
-
   before do
     ColumnKing.drop_kings
     ColumnKing.up
@@ -68,15 +63,13 @@ describe ColumnKing do
     it "creates :string columns (as varchar)" do
       connection.add_column(:kings, :name, :string)
       has_column?(:name).must_equal(true)
-      has_column_typed?(:name, /varchar/i).must_equal(true)
-      has_column_limit?(:lineage, /varchar/i, 255).must_equal(true)
+      has_column_typed?(:name, /^varchar\(255\)$/i).must_equal(true)
     end
 
     it "creates :text columns (as varchar columns)" do
       connection.add_column(:kings, :lineage, :text)
       has_column?(:lineage).must_equal(true)
-      has_column_typed?(:lineage, /varchar/i).must_equal(true)
-      has_column_limit?(:lineage, /varchar/i, 15000).must_equal(true)
+      has_column_typed?(:lineage, /^varchar\(15000\)$/i).must_equal(true)
     end
   end
 
