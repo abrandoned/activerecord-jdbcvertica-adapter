@@ -312,5 +312,16 @@ describe ::FullObject do
       _(id_column.sql_type_metadata.type).must_equal(:string)
       _(id_column.null).must_equal(true)
     end
+
+    it "correctly assigns non integer column data" do
+      model = FullObject
+      id_column = FullObject.columns.third
+      _(id_column.table_name).must_equal(model.table_name)
+      _(id_column.name).must_equal("text")
+      _(id_column.sql_type_metadata.limit).must_equal(15000)
+      _(id_column.sql_type_metadata.sql_type).must_equal("varchar(15000)")
+      _(id_column.sql_type_metadata.type).must_equal(:string)
+      _(id_column.null).must_equal(true)
+    end
   end
 end
