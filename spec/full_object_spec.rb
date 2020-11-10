@@ -1,6 +1,6 @@
 require_relative './spec_helper.rb'
 
-class CreateFullObject < ActiveRecord::Migration[5.1]
+class CreateFullObject < ActiveRecord::Migration[5.2]
   def self.up
     create_table :full_objects, :id => :bigserial do |t|
       t.string :string, :limit => 40

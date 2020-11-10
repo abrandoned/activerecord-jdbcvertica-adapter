@@ -1,6 +1,6 @@
 require_relative './spec_helper.rb'
 
-class CreateTestObject < ActiveRecord::Migration[5.1]
+class CreateTestObject < ActiveRecord::Migration[5.2]
   def self.up
     create_table :test_objects, :id => :bigserial do |t|
       t.string :string
