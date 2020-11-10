@@ -21,8 +21,5 @@ Gem::Specification.new do |gem|
   gem.add_dependency "activerecord-jdbc-adapter", "~> 60"
 
   gem.add_development_dependency "mocha"
-  gem.add_development_dependency "pry"
-  gem.add_development_dependency "pry-nav"
-  gem.add_development_dependency "pry-remote"
   gem.add_development_dependency "rake"
 end
