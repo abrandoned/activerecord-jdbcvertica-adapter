@@ -45,10 +45,8 @@ describe ::TestObject do
     it "correctly assigns all integers as bigint column data" do
       int_column_names = ["id","integer","biginteger"]
       int_columns = TestObject.columns.select{|column| int_column_names.include?(column.name)}
-      model = TestObject
       id_column = TestObject.columns.first
       _(id_column.name).must_equal("id")
-      _(id_column.table_name).must_equal(model.table_name)
       _(id_column.null).must_equal(false)
 
       int_columns.each do |int_column|
@@ -60,9 +58,7 @@ describe ::TestObject do
     end
 
     it "correctly assigns non integer column data" do
-      model = TestObject
       string_column = TestObject.columns.second
-      _(string_column.table_name).must_equal(model.table_name)
       _(string_column.name).must_equal("string")
       _(string_column.sql_type_metadata.limit).must_equal(255)
       _(string_column.sql_type_metadata.sql_type).must_equal("varchar(255)")
@@ -70,7 +66,6 @@ describe ::TestObject do
       _(string_column.null).must_equal(true)
 
       string_limited_column = TestObject.columns.third
-      _(string_limited_column.table_name).must_equal(model.table_name)
       _(string_limited_column.name).must_equal("limit_40_string")
       _(string_limited_column.sql_type_metadata.limit).must_equal(40)
       _(string_limited_column.sql_type_metadata.sql_type).must_equal("varchar(40)")

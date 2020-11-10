@@ -288,10 +288,8 @@ describe ::FullObject do
     it "correctly assigns all integers as bigint column data" do
       int_column_names = ["id","integer","biginteger"]
       int_columns = FullObject.columns.select{|column| int_column_names.include?(column.name)}
-      model = FullObject
       id_column = FullObject.columns.first
       _(id_column.name).must_equal("id")
-      _(id_column.table_name).must_equal(model.table_name)
       _(id_column.null).must_equal(false)
 
       int_columns.each do |int_column|
@@ -303,9 +301,7 @@ describe ::FullObject do
     end
 
     it "correctly assigns string with limit column data" do
-      model = FullObject
       id_column = FullObject.columns.second
-      _(id_column.table_name).must_equal(model.table_name)
       _(id_column.name).must_equal("string")
       _(id_column.sql_type_metadata.limit).must_equal(40)
       _(id_column.sql_type_metadata.sql_type).must_equal("varchar(40)")
@@ -314,9 +310,7 @@ describe ::FullObject do
     end
 
     it "correctly assigns text column data" do
-      model = FullObject
       id_column = FullObject.columns.third
-      _(id_column.table_name).must_equal(model.table_name)
       _(id_column.name).must_equal("text")
       _(id_column.sql_type_metadata.limit).must_equal(15000)
       _(id_column.sql_type_metadata.sql_type).must_equal("varchar(15000)")
