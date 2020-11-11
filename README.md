@@ -1,3 +1,7 @@
+#CircleCI Test Status
+
+[![<mrdeadsake>](https://circleci.com/gh/mrdeadsake/activerecord-jdbcvertica-adapter.svg?style=svg)](https://app.circleci.com/pipelines/github/mrdeadsake/activerecord-jdbcvertica-adapter)
+
 # Activerecord::Jdbcvertica::Adapter
 ActiveRecord adapter for Vertica databases (version 5,6,7) that works on Jruby with Vertica JDBC adapter
 
