@@ -1,8 +1,8 @@
 require_relative './spec_helper.rb'
 
-class CreateTestObject < ActiveRecord::Migration[5.2]
+class CreateTestObject < ActiveRecord::Migration[6.1]
   def self.up
-    create_table :test_objects, :id => :bigserial do |t|
+    create_table :test_objects do |t|
       t.string :string
       t.string :limit_40_string, limit: 40
       t.text :text
@@ -16,6 +16,7 @@ class CreateTestObject < ActiveRecord::Migration[5.2]
       t.time :time
       t.date :date
       t.boolean :boolean
+      t.timestamps
     end
   end
 

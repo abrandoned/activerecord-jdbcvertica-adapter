@@ -1,8 +1,8 @@
 require_relative './spec_helper.rb'
 
-class CreateFullObject < ActiveRecord::Migration[5.2]
+class CreateFullObject < ActiveRecord::Migration[6.1]
   def self.up
-    create_table :full_objects, :id => :bigserial do |t|
+    create_table :full_objects do |t|
       t.string :string, :limit => 40
       t.text :text
       t.integer :integer
@@ -13,6 +13,7 @@ class CreateFullObject < ActiveRecord::Migration[5.2]
       t.time :time
       t.date :date
       t.boolean :boolean
+      t.timestamps
     end
   end
 

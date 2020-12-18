@@ -13,6 +13,19 @@ module ::ActiveRecord
     end
 
     def self.bulk_insert(columns, data)
+      unless columns.include?("created_at")
+        columns << 'created_at'
+        data.each do |d|
+          d << ArJdbc::Vertica.current_time
+        end
+      end
+
+      unless columns.include?("updated_at")
+        columns << 'updated_at'
+        data.each do |d|
+          d << ArJdbc::Vertica.current_time
+        end
+      end
       connection.bulk_insert(self.table_name, self.primary_key, self.sequence_name, columns, data)
     end
 
@@ -293,7 +306,6 @@ end
 
 module ActiveRecord
   module ConnectionAdapters
-    class AbstractAdapter
       class SchemaCreation
         include ::ArJdbc::Vertica
         def type_to_sql(type, limit: nil, precision: nil, scale: nil, **) # :nodoc:
@@ -328,7 +340,6 @@ module ActiveRecord
           else
             type.to_s
           end
-        end
       end
     end
   end
@@ -350,6 +361,21 @@ module ActiveRecord::ConnectionAdapters
       m.register_type(%r(int)i) do
         ActiveRecord::Type::Integer.new(limit: 8)
       end
+    end
+  end
+end
+
+module ActiveRecord
+  module ConnectionAdapters
+      module DatabaseStatements
+        READ_QUERY = ActiveRecord::ConnectionAdapters::AbstractAdapter.build_read_query_regexp(
+            :close, :declare, :fetch, :move, :set, :show
+        ) # :nodoc:
+        private_constant :READ_QUERY
+
+        def write_query?(sql) # :nodoc:
+          !READ_QUERY.match?(sql)
+        end
     end
   end
 end
