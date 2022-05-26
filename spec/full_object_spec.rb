@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-class CreateFullObject < ::ActiveRecord::Migration
+class CreateFullObject < ::ActiveRecord::Migration[6.1]
   def self.up
     create_table :full_objects do |t|
       t.string :string
