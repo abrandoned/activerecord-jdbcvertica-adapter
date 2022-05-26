@@ -300,7 +300,6 @@ module ::ArJdbc
       # Generate a Random "table_name" to prevent collisions (not sure if needed)
       "temporary_table_#{::SecureRandom.hex}"
     end
-
   end
 end
 
