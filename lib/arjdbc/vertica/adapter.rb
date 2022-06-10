@@ -100,13 +100,14 @@ module ::ArJdbc
       # Vertica doesn't use the type name of bigint since all ints are 8-byte, so when the type is int use bigint instead
 
       columns = raw_columns.map do |raw_column|
+        data_type = raw_column['data_type'] == 'int' ? 'bigint' : raw_column['data_type']
         ::ActiveRecord::ConnectionAdapters::VerticaColumn.new(
             raw_column['column_name'],
             raw_column['column_default'],
             raw_column['data_type_id'],
             raw_column['table_name'],
-            raw_column['data_type'] == 'int' ? 'bigint' : raw_column['data_type'],
-            fetch_type_metadata(raw_column['data_type'] == 'int' ? 'bigint' : raw_column['data_type']),
+            data_type,
+            fetch_type_metadata(data_type),
             raw_column['is_nullable'],
             raw_column['is_identity']
         )
@@ -300,6 +301,7 @@ module ::ArJdbc
       # Generate a Random "table_name" to prevent collisions (not sure if needed)
       "temporary_table_#{::SecureRandom.hex}"
     end
+
   end
 end
 
