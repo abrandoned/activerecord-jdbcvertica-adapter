@@ -1,6 +1,6 @@
-require 'spec_helper'
+require_relative '../spec_helper.rb'
 
-class ColumnKing < ::ActiveRecord::Migration
+class ColumnKing < ::ActiveRecord::Migration[6.1]
   def self.drop_kings
     if table_exists?(:kings)
       drop_table :kings

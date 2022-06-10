@@ -13,6 +13,19 @@ module ::ActiveRecord
     end
 
     def self.bulk_insert(columns, data)
+      unless columns.include?("created_at")
+        columns << 'created_at'
+        data.each do |d|
+          d << ArJdbc::Vertica.current_time
+        end
+      end
+
+      unless columns.include?("updated_at")
+        columns << 'updated_at'
+        data.each do |d|
+          d << ArJdbc::Vertica.current_time
+        end
+      end
       connection.bulk_insert(self.table_name, self.primary_key, self.sequence_name, columns, data)
     end
 
@@ -45,6 +58,13 @@ end
 module ::ArJdbc
   module Vertica
     include ::ArJdbc::Util::QuotedCache
+    require 'arjdbc/vertica/column'
+    def self.jdbc_connection_class
+      ::ActiveRecord::ConnectionAdapters::JdbcConnection
+    end
+
+    # @see ActiveRecord::ConnectionAdapters::JdbcAdapter#jdbc_column_class
+    def jdbc_column_class; ::ActiveRecord::ConnectionAdapters::VerticaColumn end
 
     ADAPTER_NAME = 'Vertica'.freeze
     INSERT_TABLE_EXTRACTION = /into\s+(?<table_name>[^\(]*).*values\s*\(/im
@@ -67,11 +87,32 @@ module ::ArJdbc
     }
 
     TIMESTAMP_COLUMNS = [
-      "created_at",
-      "created_on",
-      "updated_at",
-      "updated_on"
+        "created_at",
+        "created_on",
+        "updated_at",
+        "updated_on"
     ]
+
+    def columns(table_name, name = nil)
+      sql = "SELECT * from V_CATALOG.COLUMNS WHERE table_name = '#{table_name}';"
+      raw_columns = execute(sql, name || "SCHEMA")
+
+      # Vertica doesn't use the type name of bigint since all ints are 8-byte, so when the type is int use bigint instead
+
+      columns = raw_columns.map do |raw_column|
+        data_type = raw_column['data_type'] == 'int' ? 'bigint' : raw_column['data_type']
+        ::ActiveRecord::ConnectionAdapters::VerticaColumn.new(
+            raw_column['column_name'],
+            raw_column['column_default'],
+            raw_column['data_type_id'],
+            raw_column['table_name'],
+            data_type,
+            fetch_type_metadata(data_type),
+            raw_column['is_nullable'],
+            raw_column['is_identity']
+        )
+      end
+    end
 
     def self.current_time
       ::ActiveRecord::Base.default_timezone == :utc ? ::Time.now.utc : ::Time.now
@@ -103,24 +144,6 @@ module ::ArJdbc
       sql << ") #{temp_table_name};"
 
       execute(sql)
-    end
-
-    def columns(table_name, name = nil)
-      sql = "SELECT * from V_CATALOG.COLUMNS WHERE table_name = '#{table_name}';"
-      raw_columns = execute(sql, name || "SCHEMA")
-
-      columns = raw_columns.map do |raw_column|
-        ::ActiveRecord::ConnectionAdapters::VerticaColumn.new(
-          raw_column['column_name'],
-          raw_column['column_default'],
-          raw_column['data_type_id'],
-          raw_column['data_type'],
-          raw_column['is_nullable'], 
-          raw_column['is_identity']
-        )
-      end
-
-      return columns
     end
 
     ##
@@ -163,7 +186,7 @@ module ::ArJdbc
 
     ##
     # Vertica JDBC does not work with JDBC GET_GENERATED_KEYS
-    # so we need to execute the sql raw and then lookup the 
+    # so we need to execute the sql raw and then lookup the
     # LAST_INSERT_ID() that occurred in this "session"
     #
     def exec_insert(sql, name, binds, primary_key = nil, sequence_name = nil)
@@ -178,7 +201,7 @@ module ::ArJdbc
 
     def native_database_types
       NATIVE_DATABASE_TYPES
-    end 
+    end
 
     def next_insert_id_for(sequence_name)
       return select_value("SELECT NEXTVAL('#{sequence_name}');")
@@ -279,21 +302,81 @@ module ::ArJdbc
       "temporary_table_#{::SecureRandom.hex}"
     end
 
-    def type_to_sql(type, limit = nil, precision = nil, scale = nil) #:nodoc:
-      super unless (type.to_sym == :integer || type.to_sym == :bigserial)
+  end
+end
 
-      if native = native_database_types[type.to_sym]
-        (native.is_a?(Hash) ? native[:name] : native).dup
-      else
-        type.to_s
+module ActiveRecord
+  module ConnectionAdapters
+      class SchemaCreation
+        include ::ArJdbc::Vertica
+        def type_to_sql(type, limit: nil, precision: nil, scale: nil, **) # :nodoc:
+          type = type.to_sym if type
+
+          if native = native_database_types[type]
+            column_type_sql = (native.is_a?(Hash) ? native[:name] : native).dup
+            if type == :decimal # ignore limit, use precision and scale
+              scale ||= native[:scale]
+
+              if precision ||= native[:precision]
+                if scale
+                  column_type_sql << "(#{precision},#{scale})"
+                else
+                  column_type_sql << "(#{precision})"
+                end
+              elsif scale
+                raise ArgumentError, "Error adding decimal column: precision cannot be empty if scale is specified"
+              end
+
+            elsif [:datetime, :timestamp, :time, :interval].include?(type) && precision ||= native[:precision]
+              if (0..6) === precision
+                column_type_sql << "(#{precision})"
+              else
+                raise(ActiveRecordError, "No #{native[:name]} type has precision of #{precision}. The allowed range of precision is from 0 to 6")
+              end
+            elsif (type != :primary_key && type != :integer)  && (limit ||= native.is_a?(Hash) && native[:limit])
+              column_type_sql << "(#{limit})"
+            end
+
+            column_type_sql
+          else
+            type.to_s
+          end
       end
     end
-
   end
 end
 
 module ActiveRecord::ConnectionAdapters
   class VerticaAdapter < JdbcAdapter
     include ::ArJdbc::Vertica
+    def initialize(connection, logger = nil, connection_parameters = nil, config = {})
+      super(connection, logger, config) # configure_connection happens in super
+    end
+
+    def jdbc_connection_class(spec)
+      ::ArJdbc::Vertica.jdbc_connection_class
+    end
+
+    def initialize_type_map(m = type_map)
+      super
+      m.register_type(%r(int)i) do
+        ActiveRecord::Type::Integer.new(limit: 8)
+      end
+    end
+  end
+end
+
+module ActiveRecord
+  module ConnectionAdapters
+      module DatabaseStatements
+        READ_QUERY = ActiveRecord::ConnectionAdapters::AbstractAdapter.build_read_query_regexp(
+            :close, :declare, :fetch, :move, :set, :show
+        ) # :nodoc:
+        private_constant :READ_QUERY
+
+        def write_query?(sql) # :nodoc:
+          !READ_QUERY.match?(sql)
+        end
+    end
   end
 end

@@ -1,6 +1,6 @@
-require 'spec_helper'
+require_relative 'spec_helper'
 
-class CreateFullObject < ::ActiveRecord::Migration
+class CreateFullObject < ActiveRecord::Migration[6.1]
   def self.up
     create_table :full_objects do |t|
       t.string :string
@@ -12,6 +12,7 @@ class CreateFullObject < ::ActiveRecord::Migration
       t.time :time
       t.date :date
       t.boolean :boolean
+      t.timestamps
     end
   end
 

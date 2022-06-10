@@ -1,15 +1,21 @@
 module ActiveRecord
-
   module ConnectionAdapters
     class VerticaColumn < Column
-      def initialize(name, default, data_type_id, sql_type = nil, null = true, primary_key = false)
+      def initialize(name, default, data_type_id, table_name, sql_type = nil, sql_meta_data = nil, null = true, default_function = nil, primary_key = false)
         super(name,
-              self.class.extract_value_from_default(default),
-              self.class.cast_type_from_data_type_id(data_type_id) || self.class.cast_type_from_sql_type(sql_type),
-              sql_type,
-              null)
+              default = self.class.extract_value_from_default(default),
+              sql_meta_data,
+              null,
+              table_name
+        )
+
         # Might need to set if it is primary key below? don't know
         # self.primary = primary_key
+      end
+
+      def self.sql_type_metadata(sql_type, data_type_id)
+        cast_type = self.cast_type_from_data_type_id(data_type_id) || self.cast_type_from_sql_type(sql_type)
+        ActiveRecord::ConnectionAdapters::SqlTypeMetadata.new(sql_type: sql_type, type: cast_type.type, limit: cast_type.limit, precision: cast_type.precision, scale: cast_type.scale)
       end
 
       def self.cast_type_from_data_type_id(data_type_id)
@@ -128,5 +134,4 @@ module ActiveRecord
       end
     end
   end
-
 end

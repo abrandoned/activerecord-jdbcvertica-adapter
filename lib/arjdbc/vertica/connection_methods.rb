@@ -13,6 +13,7 @@ class ActiveRecord::Base
   end
 
   def self.vertica5_connection(config)
+    config = config.dup
     current_host = nil
     current_port = nil
 
